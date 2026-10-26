@@ -1,16 +1,15 @@
-# Program Cek Stat Roblox Sederhana
-print("=== ROBLOX PLAYER STATS ===")
+import customtkinter as ctk
+from models.anggota_model import AnggotaModel
+from views.anggota_view import AnggotaView
+from controllers.anggota_controller import AnggotaController
 
-username = input("Masukkan Username Roblox: ")
-level = int(input("Masukkan Level Character: "))
-robux = int(input("Masukkan Total Robux: "))
+if __name__ == "__main__":
+    # 1. Inisialisasi Model dan View untuk Anggota
+    model = AnggotaModel()
+    view = AnggotaView()
 
-print("\n--- DATA PLAYER ---")
-print("Username :", username)
-print("Level    :", level)
-print("Robux    :", robux)
+    # 2. Hubungkan ke AnggotaController
+    controller = AnggotaController(view, model)
 
-if level >= 50:
-    print("Status   : Pro Player")
-else:
-    print("Status   : Beginner / Novice")
+    # 3. Jalankan Loop Utama GUI
+    view.mainloop()
