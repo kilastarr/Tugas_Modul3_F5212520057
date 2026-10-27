@@ -33,8 +33,15 @@ class AnggotaView(ctk.CTk):
         self.txt_alamat = ctk.CTkTextbox(self.frame_kiri, height=100)
         self.txt_alamat.pack(pady=(0, 10), padx=15, fill="x")
 
-        self.btn_simpan = ctk.CTkButton(self.frame_kiri, text="Simpan Data", fg_color="green", command=self.simpan_data)
-        self.btn_simpan.pack(pady=10, padx=15, fill="x")
+        # Tombol CRUD
+        self.btn_simpan = ctk.CTkButton(self.frame_kiri, text="Simpan Data", fg_color="green")
+        self.btn_simpan.pack(pady=5, padx=15, fill="x")
+
+        self.btn_update = ctk.CTkButton(self.frame_kiri, text="Perbarui Data", fg_color="#1f538d")
+        self.btn_update.pack(pady=5, padx=15, fill="x")
+
+        self.btn_delete = ctk.CTkButton(self.frame_kiri, text="Hapus Data", fg_color="red")
+        self.btn_delete.pack(pady=5, padx=15, fill="x")
 
         # FRAME KANAN: TABEL DAFTAR ANGGOTA
         self.frame_kanan = ctk.CTkFrame(self)
@@ -54,25 +61,3 @@ class AnggotaView(ctk.CTk):
         self.tabel.column("alamat", width=200)
 
         self.tabel.pack(fill="both", expand=True, padx=15, pady=10)
-
-        self.id_counter = 1
-
-    def simpan_data(self):
-        nama = self.entry_nama.get()
-        alamat = self.txt_alamat.get("1.0", "end-1c")
-
-        if nama and alamat.strip():
-            item_id = self.tabel.insert("", "end", values=(self.id_counter, nama, alamat))
-            self.id_counter += 1
-
-            # Otomatis sorot biru tebal baris yang baru disimpan
-            self.tabel.selection_set(item_id)
-            self.tabel.focus(item_id)
-
-            # Kosongkan form setelah simpan
-            self.entry_nama.delete(0, "end")
-            self.txt_alamat.delete("1.0", "end")
-
-if __name__ == "__main__":
-    app = AnggotaView()
-    app.mainloop()

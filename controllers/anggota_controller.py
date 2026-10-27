@@ -5,33 +5,23 @@ class AnggotaController:
         self.view = view
         self.model = model
 
-        # Mengikat (binding) tombol GUI dengan fungsi controller
-        btn_simpan = getattr(self.view, 'btn_simpan', getattr(self.view, 'button_simpan', None))
-        btn_update = getattr(self.view, 'btn_update', getattr(self.view, 'button_update', None))
-        btn_delete = getattr(self.view, 'btn_delete', getattr(self.view, 'button_delete', None))
+        # Binding tombol GUI
+        self.view.btn_simpan.configure(command=self.simpan_anggota)
+        self.view.btn_update.configure(command=self.update_anggota)
+        self.view.btn_delete.configure(command=self.hapus_anggota)
 
-        if btn_simpan:
-            btn_simpan.configure(command=self.simpan_anggota)
-        if btn_update:
-            btn_update.configure(command=self.update_anggota)
-        if btn_delete:
-            btn_delete.configure(command=self.hapus_anggota)
+        # Event klik baris tabel
+        self.view.tabel.bind("<<TreeviewSelect>>", self.pilih_baris_tabel)
 
-        # Mengikat event klik baris tabel untuk mengisi form
-        if hasattr(self.view, 'tabel'):
-            self.view.tabel.bind("<<TreeviewSelect>>", self.pilih_baris_tabel)
-
-        # Tampilkan data awal saat aplikasi dijalankan
+        # Tampilkan data awal
         self.tampilkan_semua_anggota()
 
     def tampilkan_semua_anggota(self):
-        # Bersihkan tabel sebelum memuat data baru
         for row in self.view.tabel.get_children():
             self.view.tabel.delete(row)
 
         anggota_list = self.model.get_all_anggota()
         for anggota in anggota_list:
-            # Pengecekan aman untuk format dictionary maupun tuple
             if isinstance(anggota, dict):
                 id_val = anggota.get('id_anggota') or anggota.get('id')
                 nama_val = anggota.get('nama')
@@ -45,20 +35,16 @@ class AnggotaController:
 
     def simpan_anggota(self):
         nama = self.view.entry_nama.get()
-        alamat = self.view.txt_alamat.get("1.0", "end-1c") if hasattr(self.view, 'txt_alamat') else self.view.entry_alamat.get()
+        alamat = self.view.txt_alamat.get("1.0", "end-1c")
 
         if nama and alamat.strip():
             try:
-                if hasattr(self.model, 'create_anggota'):
-                    self.model.create_anggota(nama, alamat)
-                else:
-                    self.model.tambah_anggota(nama, alamat)
-
+                self.model.create_anggota(nama, alamat)
                 self.tampilkan_semua_anggota()
                 self.kosongkan_form()
                 messagebox.showinfo("Sukses", "Data anggota berhasil disimpan!")
             except Exception as e:
-                messagebox.showerror("Error", f"Gagal menyimpan data anggota: {e}")
+                messagebox.showerror("Error", f"Gagal menyimpan data: {e}")
         else:
             messagebox.showwarning("Peringatan", "Semua kolom wajib diisi!")
 
@@ -66,16 +52,12 @@ class AnggotaController:
         selected_item = self.view.tabel.selection()
         if selected_item:
             item_data = self.view.tabel.item(selected_item[0])["values"]
-
+            
             self.view.entry_nama.delete(0, "end")
             self.view.entry_nama.insert(0, item_data[1])
 
-            if hasattr(self.view, 'txt_alamat'):
-                self.view.txt_alamat.delete("1.0", "end")
-                self.view.txt_alamat.insert("1.0", item_data[2])
-            elif hasattr(self.view, 'entry_alamat'):
-                self.view.entry_alamat.delete(0, "end")
-                self.view.entry_alamat.insert(0, item_data[2])
+            self.view.txt_alamat.delete("1.0", "end")
+            self.view.txt_alamat.insert("1.0", item_data[2])
 
     def update_anggota(self):
         selected_item = self.view.tabel.selection()
@@ -83,9 +65,9 @@ class AnggotaController:
             messagebox.showwarning("Peringatan", "Pilih baris anggota pada tabel yang ingin diperbarui!")
             return
 
-        id_anggota = self.view.tabel.item(selected_item[0])["values"][0]
+        id_anggota = int(self.view.tabel.item(selected_item[0])["values"][0])
         nama = self.view.entry_nama.get()
-        alamat = self.view.txt_alamat.get("1.0", "end-1c") if hasattr(self.view, 'txt_alamat') else self.view.entry_alamat.get()
+        alamat = self.view.txt_alamat.get("1.0", "end-1c")
 
         if nama and alamat.strip():
             try:
@@ -104,15 +86,11 @@ class AnggotaController:
             messagebox.showwarning("Peringatan", "Pilih baris anggota pada tabel yang ingin dihapus!")
             return
 
-        id_anggota = self.view.tabel.item(selected_item[0])["values"][0]
+        id_anggota = int(self.view.tabel.item(selected_item[0])["values"][0])
 
         if messagebox.askyesno("Konfirmasi", "Apakah Anda yakin ingin menghapus data anggota ini?"):
             try:
-                if hasattr(self.model, 'delete_anggota'):
-                    self.model.delete_anggota(id_anggota)
-                else:
-                    self.model.hapus_anggota(id_anggota)
-
+                self.model.delete_anggota(id_anggota)
                 self.tampilkan_semua_anggota()
                 self.kosongkan_form()
                 messagebox.showinfo("Sukses", "Data anggota berhasil dihapus!")
@@ -121,7 +99,4 @@ class AnggotaController:
 
     def kosongkan_form(self):
         self.view.entry_nama.delete(0, "end")
-        if hasattr(self.view, 'txt_alamat'):
-            self.view.txt_alamat.delete("1.0", "end")
-        elif hasattr(self.view, 'entry_alamat'):
-            self.view.entry_alamat.delete(0, "end")
+        self.view.txt_alamat.delete("1.0", "end")
