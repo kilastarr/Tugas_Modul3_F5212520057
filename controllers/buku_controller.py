@@ -89,20 +89,26 @@ class BukuController:
     def hapus_buku(self):
         selected_item = self.view.tabel.selection()
         if not selected_item:
-            messagebox.showwarning("Peringatan", "Pilih baris data buku pada tabel yang ingin dihapus!")
+            messagebox.showwarning("Peringatan", "Pilih baris buku pada tabel yang ingin dihapus!")
             return
 
-        id_buku = self.view.tabel.item(selected_item[0])["values"][0]
+        id_buku = int(self.view.tabel.item(selected_item[0])["values"][0])
 
         if messagebox.askyesno("Konfirmasi", "Apakah Anda yakin ingin menghapus data buku ini?"):
             try:
-                # Memanggil delete_buku sesuai nama fungsi di BukuModel
                 self.model.delete_buku(id_buku)
                 self.tampilkan_semua_buku()
                 self.kosongkan_form()
                 messagebox.showinfo("Sukses", "Data buku berhasil dihapus!")
             except Exception as e:
-                messagebox.showerror("Error", f"Gagal menghapus data: {e}")
+                # DITAMBAHKAN DI SINI: Menangkap error Foreign Key 1451 MySQL
+                if "1451" in str(e):
+                    messagebox.showerror(
+                        "Gagal Hapus", 
+                        "Data tidak dapat dihapus karena buku ini masih terikat dengan transaksi peminjaman!"
+                    )
+                else:
+                    messagebox.showerror("Error", f"Gagal menghapus data: {e}")
 
     def kosongkan_form(self):
         self.view.entry_judul.delete(0, "end")

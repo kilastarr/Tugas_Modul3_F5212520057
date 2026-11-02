@@ -23,28 +23,6 @@ class BukuModel:
             val = (judul, penulis, tahun_terbit)
             cursor.execute(query, val)
             self.conn.commit()
-            last_id = cursor.lastrowid
-            cursor.close()
-            return last_id
-        return None
-
-    def update_buku(self, id_buku, judul, penulis, tahun_terbit):
-        if self.conn:
-            cursor = self.conn.cursor()
-            query = f"UPDATE {self.table_name} SET judul = %s, penulis = %s, tahun_terbit = %s WHERE id_buku = %s"
-            val = (judul, penulis, tahun_terbit, id_buku)
-            cursor.execute(query, val)
-            self.conn.commit()
-            cursor.close()
-            return True
-        return False
-
-    def delete_buku(self, id_buku):
-        if self.conn:
-            cursor = self.conn.cursor()
-            query = f"DELETE FROM {self.table_name} WHERE id_buku = %s"
-            cursor.execute(query, (id_buku,))
-            self.conn.commit()
             cursor.close()
             return True
         return False
